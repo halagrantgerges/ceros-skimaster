@@ -16,6 +16,12 @@ class EnvironmentAssets {
       treeCluster: "img/tree_cluster.png",
       rock1: "img/rock_1.png",
       rock2: "img/rock_2.png",
+      skierJump1: "img/skier_jump_1.png",
+      skierJump2: "img/skier_jump_2.png",
+      skierJump3: "img/skier_jump_3.png",
+      skierJump4: "img/skier_jump_4.png",
+      skierJump5: "img/skier_jump_5.png",
+
     };
 
     this.loadedAssets = {};

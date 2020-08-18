@@ -3,17 +3,20 @@ class Skier {
   skierMapX;
   skierMapY;
   skierSpeed;
+  skierDistance;
+  previousDirection;
 
   constructor() {
-    console.log("new skier");
     this.skierDirection = 5;
     this.skierMapX = 0;
     this.skierMapY = 0;
     this.skierSpeed = 8;
+    this.skierDistance = 0;
+    this.previousDirection = 0;
+    this.beforeJumpDirection = 0;
   }
 
   moveSkier = function () {
-    console.log("move skier", this.skierDirection);
     switch (this.skierDirection) {
       case 2:
         this.skierMapX -= Math.round(this.skierSpeed / 1.4142);
@@ -31,6 +34,7 @@ class Skier {
 
   getSkierAsset = function () {
     var skierAssetName;
+
     switch (this.skierDirection) {
       case 0:
         skierAssetName = "skierCrash";
@@ -50,10 +54,32 @@ class Skier {
       case 5:
         skierAssetName = "skierRight";
         break;
+
+      // implementing the jump
+      case 7: case 8: case 9: case 10: case 11:
+        let jumpImgNum = (this.skierDirection % 7) + 1;
+        skierAssetName = "skierJump" + jumpImgNum;
+
+        if (this.skierDirection == 7 && this.beforeJumpDirection == 0) {
+          this.beforeJumpDirection = this.previousDirection;
+        }
+        if (this.previousDirection >= 7) {
+          this.skierDirection++;
+        }
+        break;
+
+      case 12:
+        this.skierDirection = this.beforeJumpDirection;
+        this.beforeJumpDirection = 0;
+        this.skierSpeed = 8;
+
+        return this.getSkierAsset();
+        break;
       default:
         skierAssetName = "skierRight";
     }
 
+    this.previousDirection = this.skierDirection;
     return skierAssetName;
   };
 
@@ -67,6 +93,7 @@ class Skier {
   }
 
 
+  // check if the skier hit an obstacle
   didIHitObstacle = function (loadedAssets, obstacles, gameWidth, gameHeight) {
     var skierImage = loadedAssets[this.getSkierAsset()];
     var skierRect = {
@@ -75,7 +102,7 @@ class Skier {
       top: this.skierMapY + skierImage.height - 5 + gameHeight / 2,
       bottom: this.skierMapY + skierImage.height + gameHeight / 2,
     };
-
+    var dir = this.skierDirection;
     var collision = _.find(obstacles, function (obstacle) {
       var obstacleImage = env.loadedAssets[obstacle.type];
       var obstacleRect = {
@@ -84,7 +111,6 @@ class Skier {
         top: obstacle.y + obstacleImage.height - 5,
         bottom: obstacle.y + obstacleImage.height,
       };
-
       return !(
         obstacleRect.left > skierRect.right ||
         obstacleRect.right < skierRect.left ||
@@ -95,6 +121,8 @@ class Skier {
 
 
     if (collision) {
+      this.skierSpeed = 8;
+      this.skierDistance = 0;
       this.skierDirection = 0;
     }
   };
@@ -133,6 +161,12 @@ class Skier {
       case 40: // down
         this.skierDirection = 3;
         event.preventDefault();
+        break;
+
+      case 32: // space (jump)
+        this.skierDirection = 7;
+        event.preventDefault();
+
         break;
     }
 

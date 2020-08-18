@@ -1,3 +1,4 @@
+var topScore = 0;
 $(document).ready(function () {
   var gameWidth = window.innerWidth;
   var gameHeight = window.innerHeight;
@@ -18,12 +19,27 @@ $(document).ready(function () {
   };
 
   var drawSkier = function () {
+
     var skierAssetName = skier.getSkierAsset();
     var skierImage = env.loadedAssets[skierAssetName];
+
     var x = (gameWidth - skierImage.width) / 2;
     var y = (gameHeight - skierImage.height) / 2;
 
     ctx.drawImage(skierImage, x, y, skierImage.width, skierImage.height);
+    ctx.fillStyle = "black";
+    ctx.beginPath();
+
+    ctx.font = "20px Arial";
+
+    if (skier.skierDistance > topScore)
+      topScore = skier.skierDistance;
+    ctx.fillText(`Top Score: ` + topScore, gameWidth - 250 + 2, 50);
+    ctx.fillText(`Distance: ` + skier.skierDistance, gameWidth - 250 + 2, 70);
+    ctx.fillText(`Speed: ` + skier.skierSpeed, gameWidth - 250 + 2, 90);
+    ctx.stroke();
+
+
   };
 
   var drawObstacles = function () {
@@ -105,6 +121,9 @@ $(document).ready(function () {
       case 6: // up
         placeRandomObstacle(leftEdge, rightEdge, topEdge - 50, topEdge);
         break;
+      case 6: // jump
+        placeRandomObstacle(leftEdge, rightEdge, topEdge - 50, topEdge);
+        break;
     }
   };
 
@@ -162,21 +181,24 @@ $(document).ready(function () {
       case 2:
         skier.skierMapX -= Math.round(skier.skierSpeed / 1.4142);
         skier.skierMapY += Math.round(skier.skierSpeed / 1.4142);
-
+        skier.skierDistance++;
         placeNewObstacle(skier.skierDirection);
         break;
       case 3:
         skier.skierMapY += skier.skierSpeed;
-
+        skier.skierDistance++;
         placeNewObstacle(skier.skierDirection);
         break;
       case 4:
         skier.skierMapX += skier.skierSpeed / 1.4142;
         skier.skierMapY += skier.skierSpeed / 1.4142;
-
+        skier.skierDistance++;
         placeNewObstacle(skier.skierDirection);
         break;
     }
+
+    if (skier.skierDistance != 0 && skier.skierDistance % 100 == 0)
+      skier.skierSpeed++;
   };
 
   var gameLoop = function () {
@@ -193,7 +215,15 @@ $(document).ready(function () {
 
     ctx.restore();
 
-    requestAnimationFrame(gameLoop);
+    let timeOut = 0;
+    // increase the timeout so that the user can see the jump
+    if (skier.skierDirection >= 7 && skier.skierDirection < 12) {
+      timeOut = 200;
+    }
+    setTimeout(() => {
+      requestAnimationFrame(gameLoop);
+    }, timeOut);
+
   };
 
   var loadAssets = function () {
@@ -220,9 +250,9 @@ $(document).ready(function () {
 
   var setupKeyhandler = function () {
     $(window).keydown(function (event) {
-      var x = skier.eventHandler(event);
-      if (x != null) {
-        placeNewObstacle(x);
+      var direction = skier.eventHandler(event);
+      if (direction != null) {
+        placeNewObstacle(direction);
 
       }
     });
