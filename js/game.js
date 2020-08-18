@@ -13,13 +13,9 @@ $(document).ready(function () {
       height: gameHeight + "px",
     });
   $("body").append(canvas);
-  var ctx = canvas[0].getContext("2d");
-
+  ctxManager = new CTXManager(canvas[0].getContext("2d"));
+  var ctx = ctxManager.ctx;
   var skier = new Skier();
-
-  var clearCanvas = function () {
-    ctx.clearRect(0, 0, gameWidth, gameHeight);
-  };
 
   var drawSkier = function () {
 
@@ -37,7 +33,7 @@ $(document).ready(function () {
     else {
       ctx.drawImage(skierImage, x, y, skierImage.width, skierImage.height);
       // draw rhino after long skiying sking
-      if (skier.skierDistance > 100 && rhinoY < y) {
+      if (skier.skierDistance > 50 && rhinoY < y) {
         drawRhino();
       }
     }
@@ -83,10 +79,10 @@ $(document).ready(function () {
     ctx.fillStyle = "red";
     ctx.beginPath();
     ctx.font = "50px Bold Arial";
-    var x = (gameWidth / 3);
+    var x = (gameWidth / 3.5);
     var y = (gameHeight / 2);
 
-    ctx.fillText(`GAME OVER`, x, y);
+    ctx.fillText(`GAME OVER PRESS ESC`, x, y);
     ctx.stroke();
   }
   var drawObstacles = function () {
@@ -240,7 +236,7 @@ $(document).ready(function () {
 
     // Retina support
     ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-    clearCanvas();
+    ctxManager.clearCanvas(gameWidth, gameHeight);
     moveSkier();
     skier.didIHitObstacle(env.loadedAssets, env.obstacles, gameWidth, gameHeight);
     drawSkier();
@@ -256,14 +252,17 @@ $(document).ready(function () {
     }
     setTimeout(() => {
       // Rhino is done eating me
-      if (rhinoChecker == 8)
+      if (rhinoChecker == 8) {
+        // end game
         endGame();
-      else // process games
+        $(window).keydown(function (event) {
+          // reset game after the rhino ate me
+          if (event.which == 27)
+            location.reload();
+        });
+      } else // process games
         requestAnimationFrame(gameLoop);
-
-
     }, timeOut);
-
   };
 
   var loadAssets = function () {
