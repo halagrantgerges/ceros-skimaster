@@ -68,31 +68,6 @@ $(document).ready(function () {
 
   }
 
-  var moveSkier = function () {
-
-    switch (skier.skierDirection) {
-      case 2:
-        skier.skierMapX -= Math.round(skier.skierSpeed / 1.4142);
-        skier.skierMapY += Math.round(skier.skierSpeed / 1.4142);
-        skier.skierDistance++;
-        obst.placeNewObstacle(skier);
-        break;
-      case 3:
-        skier.skierMapY += skier.skierSpeed;
-        skier.skierDistance++;
-        obst.placeNewObstacle(skier);
-        break;
-      case 4:
-        skier.skierMapX += skier.skierSpeed / 1.4142;
-        skier.skierMapY += skier.skierSpeed / 1.4142;
-        skier.skierDistance++;
-        obst.placeNewObstacle(skier);
-        break;
-    }
-
-    if (skier.skierDistance != 0 && skier.skierDistance % 100 == 0)
-      skier.skierSpeed++;
-  };
 
   var gameLoop = function () {
     $(window).keydown(function (event) {
@@ -107,7 +82,7 @@ $(document).ready(function () {
     if (!gamedPaused) {
       // proccess game
       ctxManager.saveScaleClear(gameWidth, gameHeight);
-      moveSkier();
+      skier.moveSkier();
       skier.didIHitObstacle(env.loadedAssets, env.obstacles, gameWidth, gameHeight);
       drawSkier();
       env.obstacles = obst.drawObstacles(skier);

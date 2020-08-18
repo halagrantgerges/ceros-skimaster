@@ -176,18 +176,28 @@ class Skier {
   }
 
   moveSkier = function () {
+
     switch (this.skierDirection) {
       case 2:
         this.skierMapX -= Math.round(this.skierSpeed / 1.4142);
         this.skierMapY += Math.round(this.skierSpeed / 1.4142);
+        this.skierDistance++;
+        obst.placeNewObstacle(this);
         break;
       case 3:
         this.skierMapY += this.skierSpeed;
+        this.skierDistance++;
+        obst.placeNewObstacle(this);
         break;
       case 4:
         this.skierMapX += this.skierSpeed / 1.4142;
         this.skierMapY += this.skierSpeed / 1.4142;
+        this.skierDistance++;
+        obst.placeNewObstacle(this);
         break;
     }
+
+    if (this.skierDistance != 0 && this.skierDistance % 100 == 0)
+      this.skierSpeed++;
   };
 }

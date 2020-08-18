@@ -1,6 +1,9 @@
 class CTXManager {
 
     ctx;
+    gameWidth;
+    gameHeight;
+
     constructor(ctx) {
 
         this.ctx = ctx;
