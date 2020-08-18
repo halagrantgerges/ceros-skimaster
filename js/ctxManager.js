@@ -46,4 +46,15 @@ class CTXManager {
         this.ctx.fillText(`Resetting Game....`, x, y);
         this.ctx.stroke();
     }
+
+    saveScaleClear = function (gameWidth, gameHeight) {
+        this.ctx.save();
+        this.ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        this.clearCanvas(gameWidth, gameHeight);
+
+    }
+
+    restore = function () {
+        this.ctx.restore();
+    }
 }

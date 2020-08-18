@@ -33,7 +33,7 @@ $(document).ready(function () {
     else {
       ctxManager.drawImg(skierImage, x, y, skierImage.width, skierImage.height);
       // draw rhino after long skiying sking
-      if (skier.skierDistance > 50 && rhinoY < y) {
+      if (skier.skierDistance > 800 && rhinoY < y) {
         drawRhino();
       }
     }
@@ -212,19 +212,12 @@ $(document).ready(function () {
   };
 
   var gameLoop = function () {
-    ctx.save();
-
-    // Retina support
-    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-    ctxManager.clearCanvas(gameWidth, gameHeight);
+    ctxManager.saveScaleClear(gameWidth, gameHeight);
     moveSkier();
     skier.didIHitObstacle(env.loadedAssets, env.obstacles, gameWidth, gameHeight);
     drawSkier();
-
     drawObstacles();
-
-    ctx.restore();
-
+    ctxManager.restore();
     let timeOut = 0;
     // increase the timeout so that the user can see the jump
     if ((skier.skierDirection >= 7 && skier.skierDirection < 12) || (rhinoChecker > 0 && rhinoChecker < 9)) {
@@ -234,7 +227,6 @@ $(document).ready(function () {
       // Rhino is done eating me
       if (rhinoChecker == 8) {
         // end game
-
         ctxManager.endGame(gameWidth, gameHeight);
         $(window).keydown(function (event) {
           // reset game after the rhino ate me
@@ -249,27 +241,6 @@ $(document).ready(function () {
     }, timeOut);
   };
 
-  var loadAssets = function () {
-    var assetPromises = [];
-
-    _.each(env.assets, function (asset, assetName) {
-      var assetImage = new Image();
-      var assetDeferred = new $.Deferred();
-
-      assetImage.onload = function () {
-        assetImage.width /= 2;
-        assetImage.height /= 2;
-        env.loadedAssets[assetName] = assetImage;
-
-        assetDeferred.resolve();
-      };
-      assetImage.src = asset;
-
-      assetPromises.push(assetDeferred.promise());
-    });
-
-    return $.when.apply($, assetPromises);
-  };
 
   var setupKeyhandler = function () {
     $(window).keydown(function (event) {
@@ -284,7 +255,7 @@ $(document).ready(function () {
   var initGame = function () {
     env = new EnvironmentAssets();
     setupKeyhandler();
-    loadAssets().then(function () {
+    env.loadAssets().then(function () {
       placeInitialObstacles();
 
       requestAnimationFrame(gameLoop);

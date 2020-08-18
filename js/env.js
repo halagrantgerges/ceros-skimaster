@@ -40,6 +40,27 @@ class EnvironmentAssets {
     this.obstacles = [];
   }
 
+  loadAssets = function () {
+    var assetPromises = [];
+    var localAssets = this.loadedAssets;
 
+    _.each(this.assets, function (asset, assetName) {
+      var assetImage = new Image();
+      var assetDeferred = new $.Deferred();
+
+      assetImage.onload = function () {
+        assetImage.width /= 2;
+        assetImage.height /= 2;
+        localAssets[assetName] = assetImage;
+
+        assetDeferred.resolve();
+      };
+      assetImage.src = asset;
+
+      assetPromises.push(assetDeferred.promise());
+    });
+
+    return $.when.apply($, assetPromises);
+  };
 
 }
