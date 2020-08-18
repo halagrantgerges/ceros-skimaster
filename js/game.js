@@ -68,126 +68,6 @@ $(document).ready(function () {
 
   }
 
-  var drawObstacles = function () {
-    var newObstacles = [];
-
-    _.each(env.obstacles, function (obstacle) {
-      var obstacleImage = env.loadedAssets[obstacle.type];
-      var x = obstacle.x - skier.skierMapX - obstacleImage.width / 2;
-      var y = obstacle.y - skier.skierMapY - obstacleImage.height / 2;
-
-      if (x < -100 || x > gameWidth + 50 || y < -100 || y > gameHeight + 50) {
-        return;
-      }
-
-      ctxManager.drawImg(
-        obstacleImage,
-        x,
-        y,
-        obstacleImage.width,
-        obstacleImage.height
-      );
-
-      newObstacles.push(obstacle);
-    });
-
-    obstacles = newObstacles;
-  };
-
-  var placeInitialObstacles = function () {
-    var numberObstacles = Math.ceil(
-      _.random(5, 7) * (gameWidth / 800) * (gameHeight / 500)
-    );
-
-    var minX = -50;
-    var maxX = gameWidth + 50;
-    var minY = gameHeight / 2 + 100;
-    var maxY = gameHeight + 50;
-
-    for (var i = 0; i < numberObstacles; i++) {
-      placeRandomObstacle(minX, maxX, minY, maxY);
-    }
-    env.obstacles = _.sortBy(env.obstacles, function (obstacle) {
-
-      var obstacleImage = env.loadedAssets[obstacle.type];
-
-      return obstacle.y + obstacleImage.height;
-    });
-  };
-
-  var placeNewObstacle = function (direction) {
-    var shouldPlaceObstacle = _.random(1, 8);
-    if (shouldPlaceObstacle !== 8) {
-      return;
-    }
-
-    var leftEdge = skier.skierMapX;
-    var rightEdge = skier.skierMapX + gameWidth;
-    var topEdge = skier.skierMapY;
-    var bottomEdge = skier.skierMapY + gameHeight;
-
-    switch (direction) {
-      case 1: // left
-        placeRandomObstacle(leftEdge - 50, leftEdge, topEdge, bottomEdge);
-        break;
-      case 2: // left down
-        placeRandomObstacle(leftEdge - 50, leftEdge, topEdge, bottomEdge);
-        placeRandomObstacle(leftEdge, rightEdge, bottomEdge, bottomEdge + 50);
-        break;
-      case 3: // down
-        placeRandomObstacle(leftEdge, rightEdge, bottomEdge, bottomEdge + 50);
-        break;
-      case 4: // right down
-        placeRandomObstacle(rightEdge, rightEdge + 50, topEdge, bottomEdge);
-        placeRandomObstacle(leftEdge, rightEdge, bottomEdge, bottomEdge + 50);
-        break;
-      case 5: // right
-        placeRandomObstacle(rightEdge, rightEdge + 50, topEdge, bottomEdge);
-        break;
-      case 6: // up
-        placeRandomObstacle(leftEdge, rightEdge, topEdge - 50, topEdge);
-        break;
-      case 6: // jump
-        placeRandomObstacle(leftEdge, rightEdge, topEdge - 50, topEdge);
-        break;
-    }
-  };
-
-  var placeRandomObstacle = function (minX, maxX, minY, maxY) {
-    var obstacleIndex = _.random(0, env.obstacleTypes.length - 1);
-
-    var position = calculateOpenPosition(minX, maxX, minY, maxY);
-
-    env.obstacles.push({
-      type: env.obstacleTypes[obstacleIndex],
-      x: position.x,
-      y: position.y,
-    });
-  };
-
-  var calculateOpenPosition = function (minX, maxX, minY, maxY) {
-    var x = _.random(minX, maxX);
-    var y = _.random(minY, maxY);
-
-    var foundCollision = _.find(env.obstacles, function (obstacle) {
-      return (
-        x > obstacle.x - 50 &&
-        x < obstacle.x + 50 &&
-        y > obstacle.y - 50 &&
-        y < obstacle.y + 50
-      );
-    });
-    if (foundCollision) {
-
-      return calculateOpenPosition(minX, maxX, minY, maxY);
-    } else {
-      return {
-        x: x,
-        y: y,
-      };
-    }
-  };
-
   var moveSkier = function () {
 
     switch (skier.skierDirection) {
@@ -195,18 +75,18 @@ $(document).ready(function () {
         skier.skierMapX -= Math.round(skier.skierSpeed / 1.4142);
         skier.skierMapY += Math.round(skier.skierSpeed / 1.4142);
         skier.skierDistance++;
-        placeNewObstacle(skier.skierDirection);
+        obst.placeNewObstacle(skier);
         break;
       case 3:
         skier.skierMapY += skier.skierSpeed;
         skier.skierDistance++;
-        placeNewObstacle(skier.skierDirection);
+        obst.placeNewObstacle(skier);
         break;
       case 4:
         skier.skierMapX += skier.skierSpeed / 1.4142;
         skier.skierMapY += skier.skierSpeed / 1.4142;
         skier.skierDistance++;
-        placeNewObstacle(skier.skierDirection);
+        obst.placeNewObstacle(skier);
         break;
     }
 
@@ -230,7 +110,7 @@ $(document).ready(function () {
       moveSkier();
       skier.didIHitObstacle(env.loadedAssets, env.obstacles, gameWidth, gameHeight);
       drawSkier();
-      drawObstacles();
+      env.obstacles = obst.drawObstacles(skier);
       ctxManager.restore();
       let timeOut = 0;
       // increase the timeout so that the user can see the jump
@@ -269,7 +149,7 @@ $(document).ready(function () {
     $(window).keydown(function (event) {
       var direction = skier.eventHandler(event);
       if (direction != null) {
-        placeNewObstacle(direction);
+        obst.placeNewObstacle(skier);
 
       }
     });
@@ -277,9 +157,10 @@ $(document).ready(function () {
 
   var initGame = function () {
     env = new EnvironmentAssets();
+    obst = new ObstaclesManager(gameWidth, gameHeight);
     setupKeyhandler();
     env.loadAssets().then(function () {
-      placeInitialObstacles();
+      obst.placeInitialObstacles();
 
       requestAnimationFrame(gameLoop);
     });
