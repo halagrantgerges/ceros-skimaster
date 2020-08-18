@@ -21,6 +21,15 @@ class EnvironmentAssets {
       skierJump3: "img/skier_jump_3.png",
       skierJump4: "img/skier_jump_4.png",
       skierJump5: "img/skier_jump_5.png",
+      rhinoDef: "img/rhino_default.png",
+      rhinoAteMe1: "img/rhino_lift.png",
+      rhinoAteMe2: "img/rhino_lift_eat_1.png",
+      rhinoAteMe3: "img/rhino_lift_eat_2.png",
+      rhinoAteMe4: "img/rhino_lift_eat_3.png",
+      rhinoAteMe5: "img/rhino_lift_eat_4.png",
+      rhinoAteMe6: "img/rhino_lift_mouth_open.png",
+      rhinoAteMe7: "img/rhino_run_left.png",
+      rhinoAteMe8: "img/rhino_run_left_2.png",
 
     };
 

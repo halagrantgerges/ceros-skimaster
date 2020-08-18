@@ -1,7 +1,10 @@
 var topScore = 0;
+
 $(document).ready(function () {
   var gameWidth = window.innerWidth;
   var gameHeight = window.innerHeight;
+  var rhinoY = 0;
+  var rhinoChecker = 0;
   var canvas = $("<canvas></canvas>")
     .attr("width", gameWidth * window.devicePixelRatio)
     .attr("height", gameHeight * window.devicePixelRatio)
@@ -20,16 +23,28 @@ $(document).ready(function () {
 
   var drawSkier = function () {
 
+    // get skier image to be displayed 
     var skierAssetName = skier.getSkierAsset();
     var skierImage = env.loadedAssets[skierAssetName];
 
+    // draw skier in the middle of the screen
     var x = (gameWidth - skierImage.width) / 2;
     var y = (gameHeight - skierImage.height) / 2;
 
-    ctx.drawImage(skierImage, x, y, skierImage.width, skierImage.height);
+    if (rhinoY > y) {
+      drawRhinoAteMe();
+    }
+    else {
+      ctx.drawImage(skierImage, x, y, skierImage.width, skierImage.height);
+      // draw rhino after long skiying sking
+      if (skier.skierDistance > 100 && rhinoY < y) {
+        drawRhino();
+      }
+    }
+
+    // draw info
     ctx.fillStyle = "black";
     ctx.beginPath();
-
     ctx.font = "20px Arial";
 
     if (skier.skierDistance > topScore)
@@ -42,6 +57,38 @@ $(document).ready(function () {
 
   };
 
+  // draw the rhino chasing me
+  function drawRhino() {
+    rinhoImg = env.loadedAssets['rhinoDef'];
+    var x = (gameWidth - rinhoImg.width) / 2;
+    ctx.drawImage(rinhoImg, x, rhinoY, rinhoImg.width, rinhoImg.height);
+    rhinoY = rhinoY + 2;
+
+  }
+
+  // draw rhino eating me
+  function drawRhinoAteMe() {
+
+    rhinoChecker++;
+    rinhoImg = env.loadedAssets['rhinoAteMe' + rhinoChecker];
+    var x = (gameWidth - rinhoImg.width) / 2;
+    ctx.drawImage(rinhoImg, x, rhinoY, rinhoImg.width, rinhoImg.height);
+    rhinoY = rhinoY + 2;
+
+  }
+
+  // End Game after Rhino ate me
+  function endGame() {
+
+    ctx.fillStyle = "red";
+    ctx.beginPath();
+    ctx.font = "50px Bold Arial";
+    var x = (gameWidth / 3);
+    var y = (gameHeight / 2);
+
+    ctx.fillText(`GAME OVER`, x, y);
+    ctx.stroke();
+  }
   var drawObstacles = function () {
     var newObstacles = [];
 
@@ -63,7 +110,7 @@ $(document).ready(function () {
       );
 
       newObstacles.push(obstacle);
-    }); ``
+    });
 
     obstacles = newObstacles;
   };
@@ -162,21 +209,8 @@ $(document).ready(function () {
     }
   };
 
-  var intersectRect = function (r1, r2) {
-    return !(
-      r2.left > r1.right ||
-      r2.right < r1.left ||
-      r2.top > r1.bottom ||
-      r2.bottom < r1.top
-    );
-  };
-
-
   var moveSkier = function () {
 
-    // skier.moveSkier();
-    // placeNewObstacle(skier.skierDirection);
-    // return;
     switch (skier.skierDirection) {
       case 2:
         skier.skierMapX -= Math.round(skier.skierSpeed / 1.4142);
@@ -217,11 +251,17 @@ $(document).ready(function () {
 
     let timeOut = 0;
     // increase the timeout so that the user can see the jump
-    if (skier.skierDirection >= 7 && skier.skierDirection < 12) {
+    if ((skier.skierDirection >= 7 && skier.skierDirection < 12) || (rhinoChecker > 0 && rhinoChecker < 9)) {
       timeOut = 200;
     }
     setTimeout(() => {
-      requestAnimationFrame(gameLoop);
+      // Rhino is done eating me
+      if (rhinoChecker == 8)
+        endGame();
+      else // process games
+        requestAnimationFrame(gameLoop);
+
+
     }, timeOut);
 
   };

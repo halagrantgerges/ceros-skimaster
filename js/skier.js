@@ -6,6 +6,7 @@ class Skier {
   skierDistance;
   previousDirection;
 
+  // init object variables
   constructor() {
     this.skierDirection = 5;
     this.skierMapX = 0;
@@ -16,6 +17,7 @@ class Skier {
     this.beforeJumpDirection = 0;
   }
 
+  // change X and Y of the skier
   moveSkier = function () {
     switch (this.skierDirection) {
       case 2:
@@ -31,7 +33,7 @@ class Skier {
         break;
     }
   };
-
+  // get skier image based on the direction
   getSkierAsset = function () {
     var skierAssetName;
 
