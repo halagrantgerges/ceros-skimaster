@@ -39,6 +39,9 @@ https://github.com/halagrantgerges/ceros-skimaster
 
 Bonus:
   1. Provide a way to reset the game once the game is over (click in "Esc" once the game is over)
-  2. Skier should get faster as the game progresses (please check speed indicator)
-  3. Deploy the game to a server: Deployed code on hero kuapp
+  2. Provide a way to pause and resume the game:
+      click arrow up: to pause the game.
+      click arrow left, down, or right: to resume game
+  3. Skier should get faster as the game progresses (please check speed indicator)
+  4. Deploy the game to a server: Deployed code on hero kuapp
 https://ceros-skimaster-fixed.herokuapp.com

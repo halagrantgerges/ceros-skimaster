@@ -18,6 +18,12 @@ class CTXManager {
         this.ctx.fillText(`Top Score: ` + topScore, gameWidth - 250 + 2, 50);
         this.ctx.fillText(`Distance: ` + skierDistance, gameWidth - 250 + 2, 70);
         this.ctx.fillText(`Speed: ` + skierSpeed, gameWidth - 250 + 2, 90);
+        this.ctx.fillText(`arrow up: pause`, 10, 50);
+        this.ctx.fillText(`arrow down, right, or left: resume `, 10, 80);
+        this.ctx.fillText(`space: jump `, 10, 110);
+
+
+
         this.ctx.stroke();
     }
 

@@ -1,8 +1,11 @@
 var topScore = 0;
 
 $(document).ready(function () {
+
+
   var gameWidth = window.innerWidth;
   var gameHeight = window.innerHeight;
+  var gamedPaused = false;
   var rhinoY = 0;
   var rhinoChecker = 0;
   var canvas = $("<canvas></canvas>")
@@ -212,33 +215,53 @@ $(document).ready(function () {
   };
 
   var gameLoop = function () {
-    ctxManager.saveScaleClear(gameWidth, gameHeight);
-    moveSkier();
-    skier.didIHitObstacle(env.loadedAssets, env.obstacles, gameWidth, gameHeight);
-    drawSkier();
-    drawObstacles();
-    ctxManager.restore();
-    let timeOut = 0;
-    // increase the timeout so that the user can see the jump
-    if ((skier.skierDirection >= 7 && skier.skierDirection < 12) || (rhinoChecker > 0 && rhinoChecker < 9)) {
-      timeOut = 200;
-    }
-    setTimeout(() => {
-      // Rhino is done eating me
-      if (rhinoChecker == 8) {
-        // end game
-        ctxManager.endGame(gameWidth, gameHeight);
-        $(window).keydown(function (event) {
-          // reset game after the rhino ate me
-          if (event.which == 27) {
-            ctxManager.resetGame(gameWidth, gameHeight);
+    $(window).keydown(function (event) {
+      if (event.which == 38) {
+        gamedPaused = true;
+      }
+      if (event.which == 40 || event.which == 39 || event.which == 37) {
+        gamedPaused = false;
+      }
+    });
 
-            location.reload();
-          }
-        });
-      } else // process games
-        requestAnimationFrame(gameLoop);
-    }, timeOut);
+    if (!gamedPaused) {
+      // proccess game
+      ctxManager.saveScaleClear(gameWidth, gameHeight);
+      moveSkier();
+      skier.didIHitObstacle(env.loadedAssets, env.obstacles, gameWidth, gameHeight);
+      drawSkier();
+      drawObstacles();
+      ctxManager.restore();
+      let timeOut = 0;
+      // increase the timeout so that the user can see the jump
+      if ((skier.skierDirection >= 7 && skier.skierDirection < 12) || (rhinoChecker > 0 && rhinoChecker < 9)) {
+        timeOut = 200;
+      }
+      setTimeout(() => {
+        // Rhino is done eating me
+        if (rhinoChecker == 8) {
+          // end game
+          ctxManager.endGame(gameWidth, gameHeight);
+          $(window).keydown(function (event) {
+            // reset game after the rhino ate me
+            if (event.which == 27) {
+              ctxManager.resetGame(gameWidth, gameHeight);
+
+              location.reload();
+            }
+          });
+        } else // process games
+        {
+
+
+          requestAnimationFrame(gameLoop);
+        }
+      }, timeOut);
+
+    }
+    else {
+      requestAnimationFrame(gameLoop);
+    }
   };
 
 
