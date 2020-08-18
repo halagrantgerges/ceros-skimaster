@@ -31,24 +31,16 @@ $(document).ready(function () {
       drawRhinoAteMe();
     }
     else {
-      ctx.drawImage(skierImage, x, y, skierImage.width, skierImage.height);
+      ctxManager.drawImg(skierImage, x, y, skierImage.width, skierImage.height);
       // draw rhino after long skiying sking
       if (skier.skierDistance > 50 && rhinoY < y) {
         drawRhino();
       }
     }
 
-    // draw info
-    ctx.fillStyle = "black";
-    ctx.beginPath();
-    ctx.font = "20px Arial";
-
     if (skier.skierDistance > topScore)
       topScore = skier.skierDistance;
-    ctx.fillText(`Top Score: ` + topScore, gameWidth - 250 + 2, 50);
-    ctx.fillText(`Distance: ` + skier.skierDistance, gameWidth - 250 + 2, 70);
-    ctx.fillText(`Speed: ` + skier.skierSpeed, gameWidth - 250 + 2, 90);
-    ctx.stroke();
+    ctxManager.drawInfo(topScore, skier.skierDistance, skier.skierSpeed, gameWidth);
 
 
   };
@@ -57,7 +49,7 @@ $(document).ready(function () {
   function drawRhino() {
     rinhoImg = env.loadedAssets['rhinoDef'];
     var x = (gameWidth - rinhoImg.width) / 2;
-    ctx.drawImage(rinhoImg, x, rhinoY, rinhoImg.width, rinhoImg.height);
+    ctxManager.drawImg(rinhoImg, x, rhinoY, rinhoImg.width, rinhoImg.height);
     rhinoY = rhinoY + 2;
 
   }
@@ -68,23 +60,11 @@ $(document).ready(function () {
     rhinoChecker++;
     rinhoImg = env.loadedAssets['rhinoAteMe' + rhinoChecker];
     var x = (gameWidth - rinhoImg.width) / 2;
-    ctx.drawImage(rinhoImg, x, rhinoY, rinhoImg.width, rinhoImg.height);
+    ctxManager.drawImg(rinhoImg, x, rhinoY, rinhoImg.width, rinhoImg.height);
     rhinoY = rhinoY + 2;
 
   }
 
-  // End Game after Rhino ate me
-  function endGame() {
-
-    ctx.fillStyle = "red";
-    ctx.beginPath();
-    ctx.font = "50px Bold Arial";
-    var x = (gameWidth / 3.5);
-    var y = (gameHeight / 2);
-
-    ctx.fillText(`GAME OVER PRESS ESC`, x, y);
-    ctx.stroke();
-  }
   var drawObstacles = function () {
     var newObstacles = [];
 
@@ -97,7 +77,7 @@ $(document).ready(function () {
         return;
       }
 
-      ctx.drawImage(
+      ctxManager.drawImg(
         obstacleImage,
         x,
         y,
@@ -254,11 +234,15 @@ $(document).ready(function () {
       // Rhino is done eating me
       if (rhinoChecker == 8) {
         // end game
-        endGame();
+
+        ctxManager.endGame(gameWidth, gameHeight);
         $(window).keydown(function (event) {
           // reset game after the rhino ate me
-          if (event.which == 27)
+          if (event.which == 27) {
+            ctxManager.resetGame(gameWidth, gameHeight);
+
             location.reload();
+          }
         });
       } else // process games
         requestAnimationFrame(gameLoop);
